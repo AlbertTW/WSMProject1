@@ -1,0 +1,3 @@
+This project is the first programming assignment for course, Web search and mining.
+
+16:50 3/27/2015. Albert
