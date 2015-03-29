@@ -26,7 +26,18 @@ class VectorSpace:
 
     def build(self,documents):
         """ Create the vector space for the passed document strings """
+        
         self.vectorKeywordIndex = self.getVectorKeywordIndex(documents)
+        '''writtenFileName = "keywordIndex.txt"
+        try:
+            file = open(writtenFileName, "w")
+            self.vectorKeywordIndex = self.getVectorKeywordIndex(documents)
+            wait = input("PRESS ENTER TO CONTINUE.(try)")
+        except IOError:
+            self.vectorKeywordIndex = self.getVectorKeywordIndex(documents)
+            file = open(writtenFileName, "w")
+            wait = input("PRESS ENTER TO CONTINUE.(except)")
+#Have to create file if writtenFile doesn't exist'''
         self.documentVectors = [self.makeVector(document) for document in documents]
 
         #print self.vectorKeywordIndex
