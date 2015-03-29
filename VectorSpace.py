@@ -17,7 +17,6 @@ class VectorSpace:
     #Tidies terms
     parser=None
 
-
     def __init__(self, documents=[]):
         self.documentVectors=[]
         self.parser = Parser()
@@ -108,7 +107,6 @@ class VectorSpace:
         ratings = [util.cosine(queryVector, documentVector) for documentVector in self.documentVectors]
         #ratings.sort(reverse=True)
         return ratings
-
 
 '''if __name__ == '__main__':
     #test data
