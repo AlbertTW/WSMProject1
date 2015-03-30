@@ -54,21 +54,24 @@ def sortAndPrintFirst5(vector):
 print'''
 
 
-print "Question 2. Term Frequency (TF) Weighting + Jaccard Similarity:"
+'''print "Question 2. Term Frequency (TF) Weighting + Jaccard Similarity:"
 vectorOfQ2 = searchWithJaccardSimilarity(queryString)
 print "\t\tDocID\tScore"
-sortAndPrintFirst5(vectorOfQ2)
-print
-
-
-'''print "Question 3. TF-IDF Weighting + Cosine Similarity:"
-print "\t\tDocID\tScore"
-pprint(vectorSpace.search(Query))
+print vectorOfQ2
+#sortAndPrintFirst5(vectorOfQ2)
 print'''
 
 
-print "Question 4. TF-IDF Weighting + Jaccard Similarity:"
+print "Question 3. TF-IDF Weighting + Cosine Similarity:"
 print "\t\tDocID\tScore"
-sortAndPrintFirst5(vectorOfQ2)
+vectorOfQ3 = vectorSpace.searchWithTfIdf(queryList)
+#print vectorOfQ3
+sortAndPrintFirst5(vectorOfQ3)
+print
+
+
+'''print "Question 4. TF-IDF Weighting + Jaccard Similarity:"
+print "\t\tDocID\tScore"
+sortAndPrintFirst5(vectorOfQ2)'''
 file.close()
 ###########################################

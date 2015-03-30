@@ -1,5 +1,6 @@
 from pprint import pprint
 from Parser import Parser
+from math import log
 import util
 
 class VectorSpace:
@@ -10,9 +11,11 @@ class VectorSpace:
 
     #Collection of document term vectors
     documentVectors = []
+    documentTfIdfVectors = []
 
     #Mapping of vector index to keyword
     vectorKeywordIndex=[]
+    dfCount = []
 
     #Tidies terms
     parser=None
@@ -25,20 +28,12 @@ class VectorSpace:
 
     def build(self,documents):
         """ Create the vector space for the passed document strings """
-        
         self.vectorKeywordIndex = self.getVectorKeywordIndex(documents)
-        '''writtenFileName = "keywordIndex.txt"
-        try:
-            file = open(writtenFileName, "w")
-            self.vectorKeywordIndex = self.getVectorKeywordIndex(documents)
-            wait = input("PRESS ENTER TO CONTINUE.(try)")
-        except IOError:
-            self.vectorKeywordIndex = self.getVectorKeywordIndex(documents)
-            file = open(writtenFileName, "w")
-            wait = input("PRESS ENTER TO CONTINUE.(except)")
-#Have to create file if writtenFile doesn't exist'''
+        self.dfCount = [0] * len(self.vectorKeywordIndex)
+        #print self.dfCount, len(self.dfCount)
         self.documentVectors = [self.makeVector(document) for document in documents]
-
+        self.documentTfIdfVectors = [self.makeTfIdfVector(vector) for vector in self.documentVectors]
+        #print self.documentTfIdfVectors
         #print self.vectorKeywordIndex
         #print self.documentVectors
 
@@ -74,18 +69,24 @@ class VectorSpace:
             try:
                 vector[self.vectorKeywordIndex[word]] += 1; #Use simple Term Count Model.
 #!!!!!!!!! TTTTTTTTTTFFFFFFFFFFF vector is here !!!!!!!!!!!!
-#!!!!!!!!! TTTTTTTTTTFFFFFFFFFFF vector is here !!!!!!!!!!!!
-#!!!!!!!!! TTTTTTTTTTFFFFFFFFFFF vector is here !!!!!!!!!!!!
-#!!!!!!!!! TTTTTTTTTTFFFFFFFFFFF vector is here !!!!!!!!!!!!
-#!!!!!!!!! TTTTTTTTTTFFFFFFFFFFF vector is here !!!!!!!!!!!!
-#!!!!!!!!! TTTTTTTTTTFFFFFFFFFFF vector is here !!!!!!!!!!!!
-#!!!!!!!!! TTTTTTTTTTFFFFFFFFFFF vector is here !!!!!!!!!!!!
-#!!!!!!!!! TTTTTTTTTTFFFFFFFFFFF vector is here !!!!!!!!!!!!
-#!!!!!!!!! TTTTTTTTTTFFFFFFFFFFF vector is here !!!!!!!!!!!!
+                counted = False
+                if counted == False:
+                    # print self.vectorKeywordIndex[word], len(self.dfCount)
+                    self.dfCount[self.vectorKeywordIndex[word]] += 1
+                    counted = True
             except KeyError:
                  print "Can't find \"", word, "\" in any of the documents."
         return vector
 
+    def makeTfIdfVector(self, originalVector):
+        vector = originalVector
+        words = []
+        for i in range(len(self.vectorKeywordIndex)):
+            try:
+                vector[i] = originalVector[i]*(1+log(1000.0/self.dfCount[i], 10))
+            except KeyError:
+                print "KeyError happened when making tf-idf vectors."
+        return vector
 
     def buildQueryVector(self, termList):
         """ convert query string into a term vector """
@@ -106,6 +107,11 @@ class VectorSpace:
 
         ratings = [util.cosine(queryVector, documentVector) for documentVector in self.documentVectors]
         #ratings.sort(reverse=True)
+        return ratings
+
+    def searchWithTfIdf(self, searchList):
+        queryVector = self.buildQueryVector(searchList)
+        ratings = [util.cosine(queryVector, documentTfIdfVector) for documentTfIdfVector in self.documentTfIdfVectors]
         return ratings
 
 '''if __name__ == '__main__':
