@@ -2,6 +2,7 @@ from pprint import pprint
 from Parser import Parser
 from math import log
 import util
+import re
 
 class VectorSpace:
     """ A algebraic model for representing text documents as vectors of identifiers. 
@@ -12,6 +13,7 @@ class VectorSpace:
     #Collection of document term vectors
     documentVectors = []
     documentTfIdfVectors = []
+    topRankedDocId = 0 #Use in relevance feedback query
 
     #Mapping of vector index to keyword
     vectorKeywordIndex=[]
@@ -29,10 +31,12 @@ class VectorSpace:
     def build(self,documents):
         """ Create the vector space for the passed document strings """
         self.vectorKeywordIndex = self.getVectorKeywordIndex(documents)
+        #print self.vectorKeywordIndex
         self.dfCount = [0] * len(self.vectorKeywordIndex)
         #print self.dfCount, len(self.dfCount)
         self.documentVectors = [self.makeVector(document) for document in documents]
         self.documentTfIdfVectors = [self.makeTfIdfVector(vector) for vector in self.documentVectors]
+        #print self.documentVectors
         #print self.documentTfIdfVectors
         #print self.vectorKeywordIndex
         #print self.documentVectors
@@ -79,8 +83,7 @@ class VectorSpace:
         return vector
 
     def makeTfIdfVector(self, originalVector):
-        vector = originalVector
-        words = []
+        vector = list(originalVector)
         for i in range(len(self.vectorKeywordIndex)):
             try:
                 vector[i] = originalVector[i]*(1+log(1000.0/self.dfCount[i], 10))
@@ -112,7 +115,24 @@ class VectorSpace:
     def searchWithTfIdf(self, searchList):
         queryVector = self.buildQueryVector(searchList)
         ratings = [util.cosine(queryVector, documentTfIdfVector) for documentTfIdfVector in self.documentTfIdfVectors]
-        return ratings
+        sortedIndex = [i[0] for i in sorted(enumerate(ratings), key = lambda x:x[1])]
+        self.topRankedDocId = sortedIndex[999]
+        for i in range(1, 6):
+            print "\t\t", sortedIndex[1000-i], "\t", ratings[sortedIndex[1000-i]]
+    
+    def getTopRankedId(self):
+        return self.topRankedDocId
+
+    def relevanceFeedback(self, topRankedDoc, searchList):
+        topRankedDocVector = self.makeVector(topRankedDoc)
+        queryVector = self.buildQueryVector(searchList)
+        for i in range(len(topRankedDocVector)):
+            topRankedDocVector[i] = topRankedDocVector[i] * 0.5
+            queryVector[i] = queryVector[i] + topRankedDocVector[i]
+        ratings = [util.cosine(queryVector, documentTfIdfVector) for documentTfIdfVector in self.documentTfIdfVectors]
+        sortedIndex = [i[0] for i in sorted(enumerate(ratings), key = lambda x:x[1])]
+        for i in range(1, 6):
+            print "\t\t", sortedIndex[1000-i], "\t", ratings[sortedIndex[1000-i]]
 
 '''if __name__ == '__main__':
     #test data
