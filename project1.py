@@ -111,10 +111,10 @@ while(i < len(tags)):
 newDoc = []
 for word in tags:
     newDoc.append(word[0])
-from collections import Counter
+'''from collections import Counter
 counts = Counter(tag for word, tag in tags)
-#print counts
-#print newDoc
+print counts
+print newDoc'''
 newDoc = " ".join(newDoc)
 #print newDoc
 #print topRankedId, ":", topRankedDoc
